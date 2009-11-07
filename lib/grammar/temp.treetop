@@ -1,0 +1,167 @@
+grammar RepositoryProtocol
+
+  rule message
+    credential / challenge / response / request / reply
+  end
+
+  rule credential
+    credential_hdr public_key certificate credential_end
+  end
+  
+  rule public_key
+    public_key_hdr encoded_block public_key_end
+  end
+  
+  rule signature
+    signature_hdr encoded_block signature_end
+  end
+  
+  rule validity
+    validity_hdr not_before time_tuple not_after time_tuple validity_end
+  end
+  
+  rule time_tuple
+    space "datime(" num "," num "," num "," num "," num "," num ")." space
+  end                     
+  
+  rule certificate
+    cert_hdr (clause)+ (validity)? public_key signature cert_end
+  end
+  
+  rule clause
+    (literal ":-" literal ("," literal)* "." space ) / (literal "." space)
+  end
+  
+  rule literal
+     ( "says(" iden "," predicate ")" space ) / predicate
+  end
+  
+  rule predicate
+    iden "(" iden ("," iden)* ")" space
+  end
+  
+  rule challenge
+    challenge_hdr challenge_block challenge_end
+  end  
+  
+  rule response
+    response_hdr encoded_block response_end
+  end
+  
+  rule request
+    request_hdr "request(" op "," iden ")" request_end
+  end 
+  
+  rule op
+    space ("read" / "write" / "commit") space
+  end 
+  
+  rule reply
+    reply_hdr result reply_end
+  end
+  
+  rule result
+    "granted" / "denied"
+  end
+  
+  rule credential_hdr
+    space "-----BEGIN MPKI CREDENTIAL-----" space
+  end
+  
+  rule credential_end
+    space "-----END MPKI CREDENTIAL-----" space
+  end
+  
+  rule public_key_hdr
+    space "-----BEGIN PUBLIC KEY-----" space
+  end
+  
+  rule public_key_end
+    space "-----END PUBLIC KEY-----" space
+  end
+  
+  rule signature_hdr
+    space "-----BEGIN SIGNATURE-----" space
+  end
+  
+  rule signature_end
+    space "-----END SIGNATURE-----" space
+  end
+  
+  rule validity_hdr
+    space "-----BEGIN VALIDITY-----" space
+  end
+  
+  rule validity_end
+    space "-----END VALIDITY-----" space
+  end
+  
+  rule cert_hdr
+    space "-----BEGIN MPKI CERTIFICATE-----" space
+  end
+  
+  rule cert_end
+    space "-----END MPKI CERTIFICATE-----" space
+  end
+  
+  rule challenge_hdr
+    space "-----BEGIN MPKI CHALLENGE-----" space
+  end
+  
+  rule challenge_end
+    space "-----END MPKI CHALLENGE-----" space
+  end
+  
+  rule response_hdr
+    space "-----BEGIN MPKI CHALLENGE RESPONSE-----" space
+  end
+  
+  rule response_end
+    space "-----END MPKI CHALLENGE RESPONSE-----" space
+  end
+  
+  rule request_hdr
+    space "-----BEGIN REPOSITORY CLIENT REQUEST-----" space
+  end
+  
+  rule request_end
+    space "-----END REQUEST CLIENT REQUEST-----" space
+  end
+  
+  rule reply_hdr
+    space "-----BEGIN REPOSITORY SERVER REPLY-----" space
+  end
+  
+  rule reply_end
+    space "-----END REPOSITORY SERVER REPLY-----" space
+  end
+  
+  rule not_before
+    space "Not before:" space
+  end
+  
+  rule not_after
+    space "Not after:" space
+  end
+  
+  rule encoded_block
+    space [a-zA-Z0-9\/\+\=\r\n]+ space
+  end
+  
+  rule challenge_block
+    space [a-zA-Z0-9\:]+ space
+  end
+  
+  rule num
+    space [0-9]+ space
+  end
+  
+  rule iden
+    space [a-zA-Z\_] [a-zA-Z0-9\_\-]* space
+  end
+  
+  rule space
+    [\s\t\r\n]*
+  end
+  
+end

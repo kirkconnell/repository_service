@@ -1,0 +1,259 @@
+grammar RepositoryProtocol
+
+  rule message
+    credential / response / request / reply / challenge
+  end
+
+  rule credential
+    credential_hdr public_key certificate credential_end
+    {
+      def message_type
+        "credential"
+      end
+      
+      def pk
+         public_key.data
+      end
+      
+      def cert
+        certificate.data
+      end
+    }
+  end
+  
+  rule public_key
+    public_key_hdr encoded_block public_key_end
+    {
+      def data
+        encoded_block.data
+      end
+    }
+  end
+  
+  rule signature
+    signature_hdr encoded_block signature_end
+    {
+      def data
+        encoded_block.data
+      end
+    }
+  end
+  
+  rule validity
+    validity_hdr not_before time_tuple not_after time_tuple validity_end
+    {
+      def data
+        { :not_before => elements[2].data, :not_after => elements[4].data }
+      end
+    }
+  end
+  
+  rule time_tuple
+    space "datime(" num "," num "," num "," num "," num "," num ")." space
+    {
+      def data
+        text_value.delete "\r\n\s\t"
+      end
+    }
+  end                     
+  
+  rule certificate
+    cert_hdr clauses might_have_validity public_key signature cert_end
+    {
+      def data
+        { :clauses => clauses.text_value, 
+          :validity => might_have_validity.data, 
+          :ca_pk => public_key.data,
+          :signature => signature.data }
+      end
+    }
+  end
+  
+  rule might_have_validity
+    validity?
+    {
+      def data
+        elements.first.data unless elements.empty?
+      end
+    }
+  end
+  
+  rule clauses
+    clause+
+  end
+  
+  rule clause
+    ((literal ":-" literal ("," literal)* "." ) / (literal ".")) space
+  end
+  
+  rule literal
+     ( "says(" iden "," predicate ")" space ) / predicate
+  end
+  
+  rule predicate
+    iden "(" iden ("," iden)* ")" space
+  end
+  
+  rule challenge
+    challenge_hdr challenge_block challenge_end
+    {
+      def message_type
+        "challenge"
+      end
+    }
+  end  
+  
+  rule response
+    response_hdr encoded_block response_end
+    {
+      def message_type
+        "response"
+      end
+      
+      def m
+        encoded_block.data
+      end
+      
+    }
+  end
+  
+  rule request
+    request_hdr "request(" op "," iden ")" request_end
+    {
+      def message_type
+        "request"
+      end
+      
+      def operation
+        op.text_value.delete "\r\n\s\t"
+      end
+      
+      def file
+        iden.text_value.delete "\r\n\s\t"
+      end
+    }
+  end 
+  
+  rule op
+    space ("read" / "write" / "commit") space
+  end 
+  
+  rule reply
+    reply_hdr result reply_end
+    {
+      def message_type
+        "resply"
+      end
+    }
+  end
+  
+  rule result
+    "granted" / "denied"
+  end
+  
+  rule credential_hdr
+    space "-----BEGIN MPKI CREDENTIAL-----" space
+  end
+  
+  rule credential_end
+    space "-----END MPKI CREDENTIAL-----" space
+  end
+  
+  rule public_key_hdr
+    space "-----BEGIN PUBLIC KEY-----" space
+  end
+  
+  rule public_key_end
+    space "-----END PUBLIC KEY-----" space
+  end
+  
+  rule signature_hdr
+    space "-----BEGIN SIGNATURE-----" space
+  end
+  
+  rule signature_end
+    space "-----END SIGNATURE-----" space
+  end
+  
+  rule validity_hdr
+    space "-----BEGIN VALIDITY-----" space
+  end
+  
+  rule validity_end
+    space "-----END VALIDITY-----" space
+  end
+  
+  rule cert_hdr
+    space "-----BEGIN MPKI CERTIFICATE-----" space
+  end
+  
+  rule cert_end
+    space "-----END MPKI CERTIFICATE-----" space
+  end
+  
+  rule challenge_hdr
+    space "-----BEGIN MPKI CHALLENGE-----" space
+  end
+  
+  rule challenge_end
+    space "-----END MPKI CHALLENGE-----" space
+  end
+  
+  rule response_hdr
+    space "-----BEGIN MPKI CHALLENGE RESPONSE-----" space
+  end
+  
+  rule response_end
+    space "-----END MPKI CHALLENGE RESPONSE-----" space
+  end
+  
+  rule request_hdr
+    space "-----BEGIN REPOSITORY CLIENT REQUEST-----" space
+  end
+  
+  rule request_end
+    space "-----END REQUEST CLIENT REQUEST-----" space
+  end
+  
+  rule reply_hdr
+    space "-----BEGIN REPOSITORY SERVER REPLY-----" space
+  end
+  
+  rule reply_end
+    space "-----END REPOSITORY SERVER REPLY-----" space
+  end
+  
+  rule not_before
+    space "Not before:" space
+  end
+  
+  rule not_after
+    space "Not after:" space
+  end
+  
+  rule encoded_block
+    space [a-zA-Z0-9\/\+\=\r\n]+ space
+    {
+      def data
+        text_value.delete "\r\n\t\s"
+      end
+    }
+  end
+  
+  rule challenge_block
+    space [a-zA-Z0-9\:]+ space
+  end
+  
+  rule num
+    space [0-9]+ space
+  end
+  
+  rule iden
+    space [a-zA-Z\_] [a-zA-Z0-9\_\-]* space
+  end
+  
+  rule space
+    [\s\t\r\n]*
+  end
+  
+end

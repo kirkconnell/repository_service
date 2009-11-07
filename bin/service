@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__) + "/../lib"))
+require 'repository_service'
+
+tcp = RepositoryService.start
+print "Starting Repository Server\n"
+print "Awaiting for new connections...\n"
+
+while (sock = tcp.accept)
+  Thread.start do
+    begin
+      RepositoryService.load_grammar
+      server = RepositoryService::Server.new(sock)
+      client = RepositoryService::Client.new(sock)
+      
+      client.credentials  server
+      server.challenges   client
+      client.responds     server
+      #                        
+      # until client.stops?
+      #   client.requests       server
+      #   server.replies        client
+      # end
+    
+      sock.shutdown
+      print "We're done here.\n"
+    rescue
+      print "Exception Occured: #{$!}\n#{$!.backtrace.join("\n")}"
+    end
+  end
+end
+
