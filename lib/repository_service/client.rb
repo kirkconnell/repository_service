@@ -6,9 +6,13 @@ module RepositoryService
     include SocketReader
     attr_accessor :cert
     attr_accessor :public_key
+    attr_reader   :latest_request
   
     def initialize(sock)
       @sock = sock
+      self.line_finishers = [ "-----END MPKI CREDENTIAL-----\n",
+                              "-----END MPKI CHALLENGE RESPONSE-----\n", 
+                              "-----END REPOSITORY CLIENT REQUEST-----\n" ]
     end
   
     def credentials(server)
@@ -30,11 +34,14 @@ module RepositoryService
   
     def requests(server)
       raw_data = receive_message
+      node = Controller.parse_request(raw_data)
+      @latest_request = node.request
+      
+      #todo: crazy boy authorization
     end
   
-    def stops?
-      raw_data = receive_message
-      false
+    def finished?
+      !wait_for_next_message
     end
   end
 end

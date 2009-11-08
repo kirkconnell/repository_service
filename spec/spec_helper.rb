@@ -7,3 +7,9 @@ $:.uniq!
 require 'rubygems'
 require 'spec/autorun'
 require 'repository_service'
+
+CRED_MSG = File.read(File.join(File.dirname(__FILE__), "repository_service/messages/cred.msg"))
+RESP_MSG = File.read(File.join(File.dirname(__FILE__), "repository_service/messages/resp.msg"))
+REQ_MSG = File.read(File.join(File.dirname(__FILE__), "repository_service/messages/req.msg"))
+
+RepositoryService.load_grammar

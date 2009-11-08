@@ -25,7 +25,7 @@ grammar RepositoryProtocol
     public_key_hdr encoded_block public_key_end
     {
       def data
-        encoded_block.data
+        text_value
       end
     }
   end
@@ -124,6 +124,10 @@ grammar RepositoryProtocol
         "request"
       end
       
+      def request
+        "request(#{operation}, #{file})"
+      end
+      
       def operation
         op.text_value.delete "\r\n\s\t"
       end
@@ -212,7 +216,7 @@ grammar RepositoryProtocol
   end
   
   rule request_end
-    space "-----END REQUEST CLIENT REQUEST-----" space
+    space "-----END REPOSITORY CLIENT REQUEST-----" space
   end
   
   rule reply_hdr

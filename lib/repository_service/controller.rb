@@ -1,5 +1,6 @@
 require 'thread_storage'
 require 'openssl'
+require 'base64'
 
 module RepositoryService
   class Controller
@@ -16,12 +17,16 @@ module RepositoryService
     def self.parse_response(raw_message)
       parse_message raw_message, "response", "Parsing Challenge Response"
     end
+    
+    def self.parse_request(raw_message)
+      parse_message raw_message, "request", "Parsing Repository Request"
+    end
   
     def self.authenticate(signature, original, pk)
-      header = "-----BEGIN RSA PUBLIC KEY-----"
-      footer = "-----END RSA PUBLIC KEY-----"
-      key = OpenSSL::PKey::RSA.new([header, pk, footer].join("\n"))
-      raise "Invalid Signature to Challenge Message." unless key.verify(OpenSSL::Digest::MD5.new, signature, original)
+      key = OpenSSL::PKey::RSA.new(pk)
+      raise "Invalid Signature to Challenge Message." unless 
+        key.verify(OpenSSL::Digest::MD5.new, Base64.decode64(signature), original)
+      true
     end
     
     def self.parse_message(raw_message, message_type,  notification='')

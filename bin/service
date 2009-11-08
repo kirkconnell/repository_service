@@ -4,7 +4,7 @@ require 'repository_service'
 
 tcp = RepositoryService.start
 print "Starting Repository Server\n"
-print "Awaiting for new connections...\n"
+print "I will listen... for now.\n"
 
 while (sock = tcp.accept)
   Thread.start do
@@ -16,16 +16,17 @@ while (sock = tcp.accept)
       client.credentials  server
       server.challenges   client
       client.responds     server
-      #                        
-      # until client.stops?
-      #   client.requests       server
-      #   server.replies        client
-      # end
+                              
+      until client.finished?
+        client.requests   server
+        server.replies    client
+      end
     
       sock.shutdown
       print "We're done here.\n"
     rescue
       print "Exception Occured: #{$!}\n#{$!.backtrace.join("\n")}"
+      print "Connection Closed.\n"
     end
   end
 end
