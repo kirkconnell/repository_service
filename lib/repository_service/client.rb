@@ -4,7 +4,7 @@ require 'repository_service/controller'
 module RepositoryService
   class Client
     include SocketReader
-    attr_accessor :cert
+    attr_accessor :certs # [ {}, {}, {}]
     attr_accessor :public_key
     attr_reader   :latest_request
   
@@ -13,13 +13,14 @@ module RepositoryService
       self.line_finishers = [ "-----END MPKI CREDENTIAL-----\n",
                               "-----END MPKI CHALLENGE RESPONSE-----\n", 
                               "-----END REPOSITORY CLIENT REQUEST-----\n" ]
+      self.certs = []
     end
   
     def credentials(server)
       raw_data = receive_message
       node = Controller.parse_credentials(raw_data)
-      self.cert = node.cert
       self.public_key = node.pk
+      keep_valid_certs(node)
     end
   
     def responds(server)
@@ -42,6 +43,10 @@ module RepositoryService
   
     def finished?
       !wait_for_next_message
+    end
+  private
+    def keep_valid_certs(node)
+      node.certs.each { |cert| self.certs << cert if Controller.authenticate(cert) }
     end
   end
 end

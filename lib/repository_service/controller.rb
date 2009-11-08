@@ -21,8 +21,12 @@ module RepositoryService
     def self.parse_request(raw_message)
       parse_message raw_message, "request", "Parsing Repository Request"
     end
-  
-    def self.authenticate(signature, original, pk)
+    
+    def self.authenticate(cred)
+      authenticate_signature cred[:signature], cred[:signed_data], cred[:pk]
+    end
+
+    def self.authenticate_signature(signature, original, pk)
       key = OpenSSL::PKey::RSA.new(pk)
       raise "Invalid Signature to Challenge Message." unless 
         key.verify(OpenSSL::Digest::MD5.new, Base64.decode64(signature), original)

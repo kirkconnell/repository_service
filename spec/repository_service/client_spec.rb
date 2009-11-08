@@ -15,22 +15,40 @@ module RepositoryService
       @me ||= mock("Server", {:challenge => "O HAI!"})
     end
     
-    it "should send credentials to me" do
-      client.stub!(:receive_message => CRED_MSG)
-      client.credentials me
-    end
-    
-    it "should save public key for when I need it" do
-      client.stub!(:receive_message => CRED_MSG)
-      client.credentials me
-      client.public_key.should == "-----BEGIN PUBLIC KEY-----
+    describe "handing credentials" do
+      
+      before(:each) do
+        client.stub!(:receive_message => CRED_MSG)
+        client.certs.clear
+      end
+      
+      it "should send credentials to me" do
+        client.credentials me
+      end
+
+      it "should save public key for when I need it" do
+        client.credentials me
+        client.public_key.should == "-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCvC+m32GusrDvN5tQyAlr7SEcg
 cyNTfLSHG14bgX2CQzz6z5saoYGZWI3blurN4M+yTLlYEQGcI5bqqoFy40V7b2UF
 +UtU7hlXF+0041qDgN6iQGca19mizpBsdHycYgR4NaXcEt1P3JNOczX9HDTqdXSP
 1wECQ1TmlDRLCFoqSwIDAQAB
 -----END PUBLIC KEY-----
 
-"
+"      
+      end
+
+      it "should store authentic certificates" do
+        Controller.stub!(:authenticate => true)
+        client.credentials me
+        client.certs.should_not be_empty
+      end
+
+      it "should not store nonauthentic certificates" do
+        Controller.stub!(:authenticate => false)
+        client.credentials me
+        client.certs.should be_empty
+      end 
     end
     
     it "should respond to my challenge" do

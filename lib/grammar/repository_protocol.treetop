@@ -5,7 +5,7 @@ grammar RepositoryProtocol
   end
 
   rule credential
-    credential_hdr public_key certificate credential_end
+    credential_hdr public_key certificates credential_end
     {
       def message_type
         "credential"
@@ -15,8 +15,18 @@ grammar RepositoryProtocol
          public_key.data
       end
       
-      def cert
-        certificate.data
+      def certs
+        certificates.certs
+      end
+            
+    }
+  end
+  
+  rule certificates
+    certificate*
+    {
+      def certs
+        elements.collect { |cert| cert.data }
       end
     }
   end
@@ -58,18 +68,22 @@ grammar RepositoryProtocol
   end                     
   
   rule certificate
-    cert_hdr clauses might_have_validity public_key signature cert_end
+    cert_hdr clauses optional_validity public_key signature cert_end
     {
       def data
-        { :clauses => clauses.text_value, 
-          :validity => might_have_validity.data, 
-          :ca_pk => public_key.data,
-          :signature => signature.data }
+        { :clauses => clauses.data, 
+          :validity => optional_validity.data, 
+          :pk => public_key.data,
+          :signature => signature.data,
+          :signed_data => [ clauses.data, 
+                            optional_validity.data[:not_before],
+                            optional_validity.data[:not_after] ].join 
+        }
       end
     }
   end
   
-  rule might_have_validity
+  rule optional_validity
     validity?
     {
       def data
@@ -80,6 +94,11 @@ grammar RepositoryProtocol
   
   rule clauses
     clause+
+    {
+      def data
+        text_value.delete("\r\n\s\t")
+      end
+    }
   end
   
   rule clause
