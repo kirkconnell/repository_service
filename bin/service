@@ -6,9 +6,10 @@ tcp = RepositoryService.start
 print "Starting Repository Server\n"
 print "I will listen... for now.\n"
 
+
 while (sock = tcp.accept)
   Thread.start do
-    begin
+    begin      
       RepositoryService.load_grammar
       server = RepositoryService::Server.new(sock)
       client = RepositoryService::Client.new(sock)

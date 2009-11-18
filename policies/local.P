@@ -1,0 +1,26 @@
+:-table says/2.
+:-multifile says/2.
+
+/* Sign rule */
+says(P, Statement) :-
+	says(PK, Statement),
+	pk_belong(PK, P).
+
+pk_belong(rsa_b2fcee5a72a0f5674d6537e870d71543, simon).
+
+says(Group, Statement) :-
+	group_leader(Group, Leader),
+	says(Leader, Statement).
+
+group_leader(group0, simon).
+group_leader(group1, jeremiah).
+
+
+/* Local access policy */
+allow(PK, Access, Dir) :-
+	dir(Group, Dir),
+	says(Group, allow(PK, Access, Dir)).
+
+dir(group0, file1).
+dir(group0, file2).
+dir(group1, file3).

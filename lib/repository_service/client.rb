@@ -29,7 +29,7 @@ module RepositoryService
       signature = node.m
       original = server.challenge
     
-      Controller.authenticate signature, original, self.public_key
+      Controller.authenticate :signature => signature, :signed_data => original, :pk => self.public_key
       print "Signature Verification Succeded.\n"
     end
   

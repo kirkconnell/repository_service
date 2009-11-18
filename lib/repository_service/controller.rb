@@ -1,6 +1,7 @@
 require 'thread_storage'
 require 'openssl'
 require 'base64'
+require 'digest/md5'
 
 module RepositoryService
   class Controller

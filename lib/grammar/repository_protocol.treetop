@@ -107,6 +107,11 @@ grammar RepositoryProtocol
   
   rule literal
      ( "says(" iden "," predicate ")" space ) / predicate
+     {
+       def import(rsa_key)
+         "says(#{rsa_key}, #{text_value})"
+       end
+     }
   end
   
   rule predicate
