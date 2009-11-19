@@ -9,6 +9,8 @@ require 'repository_service/server'
 require 'repository_service/client'
 require 'thread_storage'
 
+require 'repository_service/translation_helper'
+
 module RepositoryService
   extend ThreadStorage
   

@@ -30,11 +30,6 @@ module RepositoryService
           cert[:signature].should_not be_blank
         end
         
-        it "ttt" do
-          cert = @node.certificates.elements.first
-          cert.clauses.elements[3].import("rsa_hello").should == ""
-        end
-        
       end
     
       it "should parse challenge responses" do
@@ -81,31 +76,6 @@ cyNTfLSHG14bgX2CQzz6z5saoYGZWI3blurN4M+yTLlYEQGcI5bqqoFy40V7b2UF
 -----END PUBLIC KEY-----"
       
         Controller.authenticate(:signature => signature, :signed_data => original, :pk => pk).should == true
-      end
-      
-      
-      
-      ########################################################
-      
-      it "should generate id for say stuff" do
-        pk = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQD6gkiTvzHRJQviUXnlK4aO2U7j
-M14MU3fyKvom7yTRrjq5cwVgtIEZb6ZFTX6wM4y4ii3r1qjoyuIKQwYV0heHswe6
-jmoAmGJyTNY1dtrshcXN6N3Co5zXCShmQdt/y3bUDl9/rrVHatAAwDhC9/RwecjG
-pV24BPuAEjIJfa1gVwIDAQAB"
-
-        id = Digest::MD5.hexdigest(Base64.decode64(pk))
-        id.should == "b2fcee5a72a0f5674d6537e870d71543"
-      end
-      
-      it "should do stuff" do
-        pk = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCvC+m32GusrDvN5tQyAlr7SEcg
-cyNTfLSHG14bgX2CQzz6z5saoYGZWI3blurN4M+yTLlYEQGcI5bqqoFy40V7b2UF
-+UtU7hlXF+0041qDgN6iQGca19mizpBsdHycYgR4NaXcEt1P3JNOczX9HDTqdXSP
-1wECQ1TmlDRLCFoqSwIDAQAB"
-
-        #key = OpenSSL::PKey::RSA.new(pk)
-        id = Digest::MD5.hexdigest(Base64.decode64(pk))
-        id.should == "3fcb4a57240d9287e43b8615e9994bba"
       end
       
     end

@@ -2,6 +2,12 @@ grammar RepositoryProtocol
 
   rule message
     credential / response / request / reply / challenge
+
+    {
+      def node_type
+        "message"
+      end
+    }
   end
 
   rule credential
@@ -18,6 +24,10 @@ grammar RepositoryProtocol
       def certs
         certificates.certs
       end
+
+      def node_type
+        "credential"
+      end
             
     }
   end
@@ -28,6 +38,10 @@ grammar RepositoryProtocol
       def certs
         elements.collect { |cert| cert.data }
       end
+
+      def node_type
+        "certificates"
+      end
     }
   end
   
@@ -36,6 +50,10 @@ grammar RepositoryProtocol
     {
       def data
         text_value
+      end
+
+      def node_type
+        "public_key"
       end
     }
   end
@@ -46,6 +64,10 @@ grammar RepositoryProtocol
       def data
         encoded_block.data
       end
+
+      def node_type
+        "signature"
+      end
     }
   end
   
@@ -55,6 +77,10 @@ grammar RepositoryProtocol
       def data
         { :not_before => elements[2].data, :not_after => elements[4].data }
       end
+
+      def node_type
+        "validity"
+      end
     }
   end
   
@@ -63,6 +89,10 @@ grammar RepositoryProtocol
     {
       def data
         text_value.delete "\r\n\s\t"
+      end
+
+      def node_type
+        "time_tuple"
       end
     }
   end                     
@@ -77,8 +107,13 @@ grammar RepositoryProtocol
           :signature => signature.data,
           :signed_data => [ clauses.data, 
                             optional_validity.data[:not_before],
-                            optional_validity.data[:not_after] ].join 
+                            optional_validity.data[:not_after] ].join,
+          :clauses => clauses.elements 
         }
+      end
+
+      def node_type
+        "certificate"
       end
     }
   end
@@ -89,6 +124,10 @@ grammar RepositoryProtocol
       def data
         elements.first.data unless elements.empty?
       end
+
+      def node_type
+        "optional_validity"
+      end
     }
   end
   
@@ -98,30 +137,132 @@ grammar RepositoryProtocol
       def data
         text_value.delete("\r\n\s\t")
       end
+
+      def node_type
+        "clauses"
+      end
     }
   end
   
   rule clause
-    ((literal ":-" literal ("," literal)* "." ) / (literal ".")) space
+    clause_content space
+    {
+      def import(rsa_key)
+        clause_content.import(rsa_key)
+      end
+
+      def imported_clause?
+        clause_content.imported_clause?
+      end
+
+      def node_type
+        "clause"
+      end
+    }
+  end
+
+  rule clause_content
+    implication / single_atom
+    {
+      def import(rsa_key)
+        internal_import(rsa_key)
+      end
+
+      def imported_clause?
+        elements.first.imported_clause?
+      end
+
+      def node_type
+        "clause_content"
+      end
+    }
+  end
+
+  rule single_atom
+    literal "."
+    {
+      def internal_import(rsa_key)
+        "#{literal.import(rsa_key)}."
+      end
+
+      def imported_clause?
+        literal.imported_clause?
+      end
+
+      def node_type
+        "single_atom"
+      end
+    }
+  end
+
+  rule implication
+    literal ":-" literal other_literals "."
+    {
+      def import(rsa_key)
+        imported_string = ""        
+        elements.each do |e|
+          imported_string << if e.respond_to? "import"
+            e.import(rsa_key) 
+          else
+            e.text_value
+          end
+        end
+        imported_string.squeeze(" ").delete("\t\r\n")
+      end
+
+      def node_type
+        "implication"
+      end
+    }
+  end
+
+  rule other_literals
+    ("," literal)*
+    {
+      def import(rsa_key)
+        imported_clause = ""
+        elements.each do |e|
+          imported_clause << ",#{e.elements.last.import(rsa_key)}"
+        end
+        imported_clause
+      end
+    }
   end
   
   rule literal
-     ( "says(" iden "," predicate ")" space ) / predicate
-     {
-       def import(rsa_key)
-         "says(#{rsa_key}, #{text_value})"
-       end
-     }
+    ( "says(" iden "," predicate ")" space ) / predicate
+    {
+      def import(rsa_key)
+        "says(#{rsa_key}, #{text_value})"
+      end
+      
+      def imported_clause?
+        /says(.*)\./ === text_value
+      end
+
+      def node_type
+        "literal"
+      end
+    }
   end
   
   rule predicate
     iden "(" iden ("," iden)* ")" space
+    {
+      def node_type
+        "predicate"
+      end
+    }
   end
   
   rule challenge
     challenge_hdr challenge_block challenge_end
     {
       def message_type
+        "challenge"
+      end
+
+      def node_type
         "challenge"
       end
     }
@@ -138,6 +279,9 @@ grammar RepositoryProtocol
         encoded_block.data
       end
       
+      def node_type
+        "response"
+      end
     }
   end
   
@@ -159,6 +303,10 @@ grammar RepositoryProtocol
       def file
         iden.text_value.delete "\r\n\s\t"
       end
+
+      def node_type
+        "request"
+      end
     }
   end 
   
@@ -171,6 +319,10 @@ grammar RepositoryProtocol
     {
       def message_type
         "resply"
+      end
+
+      def node_type
+        "reply"
       end
     }
   end
