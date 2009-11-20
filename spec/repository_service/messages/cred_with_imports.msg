@@ -9,19 +9,11 @@ cyNTfLSHG14bgX2CQzz6z5saoYGZWI3blurN4M+yTLlYEQGcI5bqqoFy40V7b2UF
 
 -----BEGIN MPKI CERTIFICATE-----
 
+says(rsa_example, allow(jeremiah, write, file3)).
+
 allow(PK, Access, Resources) :-
 	    pk_bind(P, PK),
-	    allow(P, Access, Resources).
-
-pk_bind(jeremiah, rsa_3fcb4a57240d9287e43b8615e9994bba).
-
-allow(jeremiah, read, file1).
-
-allow(jeremiah, _anyAccess, file2).
-
-allow(jeremiah, read, file3).
-
-says(rsa_example, allow(jeremiah, write, file3)).
+	    says(rsa_example, allow(P, Access, Resources)).
 
 -----BEGIN VALIDITY-----
 Not before: datime(2007,10,12,0,0,0).

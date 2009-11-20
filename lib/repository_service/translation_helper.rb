@@ -5,7 +5,8 @@ module RepositoryService
     end
 
     def translate_clause(pk, clause)
-      clause.import(context_name(pk)).delete(" ")
+      translation = clause.import(context_name(pk))
+      translation.delete(" ") unless translation.nil?
     end
 
     def imported?(clause)

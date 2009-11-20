@@ -28,9 +28,21 @@ pV24BPuAEjIJfa1gVwIDAQAB"
 
     it "should translate an implication clause to an imported implication clause" do
       th = TestTranslationHelper.new
-      clause_node = Controller.parse_credentials(CRED_MSG).certs.first[:clauses][0]
+      clause_node = Controller.parse_credentials(CRED_MSG).certs.first[:clauses].first
       th.translate_clause(@pk, clause_node).should == "says(rsa_b2fcee5a72a0f5674d6537e870d71543, allow(PK, Access, Resources)) :- says(rsa_b2fcee5a72a0f5674d6537e870d71543, pk_bind(P, PK)), says(rsa_b2fcee5a72a0f5674d6537e870d71543, allow(P, Access, Resources)).".delete(" ")
-    end   
+    end
+
+    it "should not import single clauses from other contexts" do
+      th = TestTranslationHelper.new
+      clause_node = Controller.parse_credentials(IMP_CRED_MSG).certs.first[:clauses].first
+      th.translate_clause(@pk, clause_node).should be_nil
+    end
+    
+    it "should import implications with imported clauses on a non head node" do
+      th = TestTranslationHelper.new
+      clause_node = Controller.parse_credentials(IMP_CRED_MSG).certs.first[:clauses][1]
+      th.tranlate_clause(@pk, clause_node).should == "says(rsa_b2fcee5a72a0f5674d6537e870d71543, allow(PK, Access, Resources)) :- says(rsa_b2fcee5a72a0f5674d6537e870d71543, pk_bind(P, PK)), says(rsa_example, allow(P, Access, Resources)).".delete(" ")
+    end
 
   end
 end

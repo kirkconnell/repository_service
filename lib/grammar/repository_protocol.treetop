@@ -182,11 +182,11 @@ grammar RepositoryProtocol
     literal "."
     {
       def internal_import(rsa_key)
-        "#{literal.import(rsa_key)}."
-      end
-
-      def imported_clause?
-        literal.imported_clause?
+        unless elements.first.elements.first.text_value == "says("
+          "#{literal.import(rsa_key)}."
+        else
+          nil
+        end
       end
 
       def node_type
@@ -234,10 +234,6 @@ grammar RepositoryProtocol
     {
       def import(rsa_key)
         "says(#{rsa_key}, #{text_value})"
-      end
-      
-      def imported_clause?
-        /says(.*)\./ === text_value
       end
 
       def node_type
