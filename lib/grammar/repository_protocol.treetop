@@ -182,7 +182,7 @@ grammar RepositoryProtocol
     literal "."
     {
       def internal_import(rsa_key)
-        unless elements.first.elements.first.text_value == "says("
+        unless elements.first.elements[1].text_value == "says("
           "#{literal.import(rsa_key)}."
         else
           nil
@@ -199,15 +199,19 @@ grammar RepositoryProtocol
     literal ":-" literal other_literals "."
     {
       def import(rsa_key)
-        imported_string = ""        
-        elements.each do |e|
-          imported_string << if e.respond_to? "import"
-            e.import(rsa_key) 
-          else
-            e.text_value
-          end
+      	unless elements.first.elements[1].text_value == "says("
+	        imported_string = ""        
+	        elements.each do |e|
+	          imported_string << if e.respond_to? "import"
+	            e.import(rsa_key) 
+	          else
+	            e.text_value
+	          end
+	        end
+          imported_string.squeeze(" ").delete("\t\r\n")
+        else
+          nil  
         end
-        imported_string.squeeze(" ").delete("\t\r\n")
       end
 
       def node_type
@@ -222,7 +226,12 @@ grammar RepositoryProtocol
       def import(rsa_key)
         imported_clause = ""
         elements.each do |e|
-          imported_clause << ",#{e.elements.last.import(rsa_key)}"
+					literal_node = e.elements.last
+          imported_clause << unless literal_node.elements[1].text_value == "says("
+          	",#{literal_node.import(rsa_key)}"
+        	else
+        		",#{literal_node.text_value}"
+      		end
         end
         imported_clause
       end
@@ -230,7 +239,7 @@ grammar RepositoryProtocol
   end
   
   rule literal
-    ( "says(" iden "," predicate ")" space ) / predicate
+    ( space "says(" iden "," predicate ")" space ) / predicate
     {
       def import(rsa_key)
         "says(#{rsa_key}, #{text_value})"

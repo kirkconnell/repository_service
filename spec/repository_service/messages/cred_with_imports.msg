@@ -15,6 +15,14 @@ allow(PK, Access, Resources) :-
 	    pk_bind(P, PK),
 	    says(rsa_example, allow(P, Access, Resources)).
 
+allow(PK, Access, Resources) :-
+	    says(rsa_example, allow(P, Access, Resources)),
+	    pk_bind(P, PK).
+	    
+says(rsa_example, allow(PK, Access, Resoures)) :-
+			pk_bind(P, PK),
+			allow(P, Access, Resources).
+
 -----BEGIN VALIDITY-----
 Not before: datime(2007,10,12,0,0,0).
 Not after: datime(2007,12,19,0,0,0).
