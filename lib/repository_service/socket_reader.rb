@@ -5,7 +5,7 @@ module RepositoryService
     def receive_message
       message = read_complete_message
       unless dos_attack? message
-        print "Message Received:\n#{message}\n"
+        say "Message Received:\n#{message}\n"
         message
       else
         raise "Message exceeds 50K limit. Connection closed."
@@ -24,7 +24,7 @@ module RepositoryService
     def wait_for_next_message
       results = select([@sock], nil, nil)
       if results[0].include? @sock
-        print "Incoming!\n"
+        say "Incoming!\n"
         true
       else
         print "I don't know where that came from sir!\n"
@@ -40,6 +40,18 @@ module RepositoryService
         message << last_line
       end until @line_finishers.include? last_line
       message
+    end
+    
+    def say(words)
+      print words unless @silent_mode
+    end
+    
+    def be_quiet!
+      @silent_mode = true
+    end
+    
+    def quiet?
+      @silent_mode
     end
     
   end

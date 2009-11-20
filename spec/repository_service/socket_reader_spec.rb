@@ -51,4 +51,13 @@ describe RepositoryService::SocketReader do
     reader.wait_for_next_message
   end
   
+  it "should have a silent mode option" do
+    reader.be_quiet!
+    reader.should be_quiet
+  end
+  
+  it "should be not be quiet by default" do
+    reader.should_not be_quiet
+  end
+  
 end

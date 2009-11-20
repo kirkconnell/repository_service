@@ -12,7 +12,7 @@ module RepositoryService
     end
     
     def client
-      @client ||= mock("client")
+      @client ||= mock("client", :latest_request => "request")
     end
     
     it "challenges client" do
@@ -21,6 +21,13 @@ module RepositoryService
     end
     
     it "replies to client" do
+      server.stub!(:authorizer).and_return(mock("authorizer", :authorize_request => "granted"))
+      server.replies client
+    end
+    
+    it "should authorize request for replying" do
+      server.stub!(:authorizer).and_return(mock("authorizer", :authorize_request => "granted"))
+      server.authorizer.should_receive(:authorize_request)
       server.replies client
     end
     

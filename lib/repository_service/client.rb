@@ -37,8 +37,6 @@ module RepositoryService
       raw_data = receive_message
       node = Controller.parse_request(raw_data)
       @latest_request = node.request
-      
-      #todo: crazy boy authorization
     end
   
     def finished?

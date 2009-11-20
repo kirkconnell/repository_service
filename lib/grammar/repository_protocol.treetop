@@ -200,15 +200,13 @@ grammar RepositoryProtocol
     {
       def import(rsa_key)
       	unless elements.first.elements[1].text_value == "says("
-	        imported_string = ""        
-	        elements.each do |e|
+	        elements.inject("") do |imported_string, e|
 	          imported_string << if e.respond_to? "import"
 	            e.import(rsa_key) 
 	          else
 	            e.text_value
 	          end
-	        end
-          imported_string.squeeze(" ").delete("\t\r\n")
+	        end.squeeze(" ").delete("\t\r\n")
         else
           nil  
         end
@@ -224,8 +222,7 @@ grammar RepositoryProtocol
     ("," literal)*
     {
       def import(rsa_key)
-        imported_clause = ""
-        elements.each do |e|
+        elements.inject("") do |imported_clause, e|
 					literal_node = e.elements.last
           imported_clause << unless literal_node.elements[1].text_value == "says("
           	",#{literal_node.import(rsa_key)}"
@@ -233,7 +230,6 @@ grammar RepositoryProtocol
         		",#{literal_node.text_value}"
       		end
         end
-        imported_clause
       end
     }
   end

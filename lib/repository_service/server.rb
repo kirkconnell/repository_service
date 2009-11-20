@@ -1,13 +1,16 @@
 require 'repository_service/socket_reader'
 require 'repository_service/controller'
+require 'repository_service/authorizer'
 require 'uuidtools'
 
 module RepositoryService
   class Server
     attr_accessor :challenge
+    attr_reader :authorizer
   
     def initialize(sock)
       @sock = sock
+      @authorizer = RepositoryService::Authorizer.new
     end
   
     def challenges(client)
@@ -18,8 +21,7 @@ module RepositoryService
     end
   
     def replies(client)
-      # TODO: I'll need to verify the client object to see if the client is allowed to perform the action
-      result = "granted"
+      result = authorizer.authorize_request(client.latest_request)
       reply = "-----BEGIN REPOSITORY SERVER REPLY-----\n#{result}-----END REPOSITORY SERVER REPLY-----\n"
       @sock.send(reply, 0)
     end
