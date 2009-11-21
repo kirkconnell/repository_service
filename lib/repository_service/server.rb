@@ -1,10 +1,12 @@
 require 'repository_service/socket_reader'
 require 'repository_service/controller'
 require 'repository_service/authorizer'
+require 'repository_service/sayer'
 require 'uuidtools'
 
 module RepositoryService
   class Server
+    include Sayer
     attr_accessor :challenge
     attr_reader :authorizer
   
@@ -15,7 +17,7 @@ module RepositoryService
   
     def challenges(client)
       self.challenge = UUIDTools::UUID.random_create.to_s.delete '-'
-      print "Sending Challenge #{self.challenge}\n"
+      say "Sending Challenge #{self.challenge}\n"
       challenge_message = "-----BEGIN MPKI CHALLENGE-----\n#{self.challenge}\n-----END MPKI CHALLENGE-----\n"
       @sock.send(challenge_message, 0)
     end

@@ -1,5 +1,8 @@
+require 'repository_service/sayer'
+
 module RepositoryService
   module SocketReader
+    include Sayer
     attr_accessor :line_finishers
     
     def receive_message
@@ -27,7 +30,7 @@ module RepositoryService
         say "Incoming!\n"
         true
       else
-        print "I don't know where that came from sir!\n"
+        say "I don't know where that came from sir!\n"
         false
       end
     end
@@ -41,18 +44,5 @@ module RepositoryService
       end until @line_finishers.include? last_line
       message
     end
-    
-    def say(words)
-      print words unless @silent_mode
-    end
-    
-    def be_quiet!
-      @silent_mode = true
-    end
-    
-    def quiet?
-      @silent_mode
-    end
-    
   end
 end

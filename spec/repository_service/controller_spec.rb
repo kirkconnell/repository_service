@@ -2,16 +2,24 @@ require File.join(File.dirname(__FILE__), "../spec_helper.rb")
 
 module RepositoryService
   describe Controller do
-    
+
+    before(:all) do
+      @controller = Controller.new
+      @controller.be_quiet!
+    end
+
+    def controller
+      @controller
+    end    
+
     describe "parsing messages" do
       it "should have a parser" do
-        Controller.parser.should_not be_nil
+        controller.parser.should_not be_nil
       end
-    
       
       describe "credentials" do
         before(:all) do
-          @node = Controller.parse_credentials(CRED_MSG)
+          @node = controller.parse_credentials(CRED_MSG)
         end
       
         it "should parse credentials" do
@@ -33,12 +41,12 @@ module RepositoryService
       end
     
       it "should parse challenge responses" do
-        node = Controller.parse_response(RESP_MSG)
+        node = controller.parse_response(RESP_MSG)
         node.m.should_not be_blank
       end
     
       it "should parse repository requests" do
-        node = Controller.parse_request(REQ_MSG)
+        node = controller.parse_request(REQ_MSG)
         node.request.should_not be_blank
       end
       
@@ -59,7 +67,7 @@ pV24BPuAEjIJfa1gVwIDAQAB
 qRlennVsbIHBLEjO5zj+It5ggEIqu9HR6j9aQGHkcET3Dg9wh2/qqOHGs4ULtsex
 UlN8fQQxt3aWieJgi/ZEkMhLErz9lZ6io6X8icWh0oM="
         }
-        Controller.authenticate(cert).should == true
+        controller.authenticate(cert).should == true
       end
     
       it "should authenticate challenge responses" do
@@ -75,7 +83,7 @@ cyNTfLSHG14bgX2CQzz6z5saoYGZWI3blurN4M+yTLlYEQGcI5bqqoFy40V7b2UF
 1wECQ1TmlDRLCFoqSwIDAQAB
 -----END PUBLIC KEY-----"
       
-        Controller.authenticate(:signature => signature, :signed_data => original, :pk => pk).should == true
+        controller.authenticate(:signature => signature, :signed_data => original, :pk => pk).should == true
       end
       
     end

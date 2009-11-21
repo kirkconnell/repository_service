@@ -14,6 +14,10 @@ module RepositoryService
     def me
       @me ||= mock("Server", {:challenge => "O HAI!"})
     end
+
+    before(:each) do
+      client.be_quiet!
+    end
     
     describe "handing credentials" do
       
@@ -39,13 +43,13 @@ cyNTfLSHG14bgX2CQzz6z5saoYGZWI3blurN4M+yTLlYEQGcI5bqqoFy40V7b2UF
       end
 
       it "should store authentic certificates" do
-        Controller.stub!(:authenticate => true)
+        client.controller.stub!(:authenticate => true)
         client.credentials me
         client.certs.should_not be_empty
       end
 
       it "should not store nonauthentic certificates" do
-        Controller.stub!(:authenticate => false)
+        client.controller.stub!(:authenticate => false)
         client.credentials me
         client.certs.should be_empty
       end 
@@ -53,7 +57,7 @@ cyNTfLSHG14bgX2CQzz6z5saoYGZWI3blurN4M+yTLlYEQGcI5bqqoFy40V7b2UF
     
     it "should respond to my challenge" do
       client.stub!(:receive_message => RESP_MSG)
-      Controller.stub!(:authenticate => true)
+      client.controller.stub!(:authenticate => true)
       client.responds me
     end
     

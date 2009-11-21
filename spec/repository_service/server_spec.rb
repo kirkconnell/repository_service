@@ -14,6 +14,10 @@ module RepositoryService
     def client
       @client ||= mock("client", :latest_request => "request")
     end
+
+    before(:all) do
+      server.be_quiet!
+    end
     
     it "challenges client" do
       server.challenges client

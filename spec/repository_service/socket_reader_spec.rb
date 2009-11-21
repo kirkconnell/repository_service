@@ -16,6 +16,7 @@ describe RepositoryService::SocketReader do
     @reader = TestSocketReader.new
     @reader.line_finishers << test_line 
     @reader.sock = mock("socket", {:readline => test_line, :shutdown => true, :recv => ""})
+    @reader.be_quiet!
   end
   
   def reader
@@ -49,15 +50,6 @@ describe RepositoryService::SocketReader do
   it "should wait for more messages" do
     reader.should_receive(:select).and_return([[reader.sock]])
     reader.wait_for_next_message
-  end
-  
-  it "should have a silent mode option" do
-    reader.be_quiet!
-    reader.should be_quiet
-  end
-  
-  it "should be not be quiet by default" do
-    reader.should_not be_quiet
   end
   
 end
