@@ -6,6 +6,7 @@ module RepositoryService
     include SocketReader
     attr_accessor :certs # [ {}, {}, {}]
     attr_accessor :public_key
+    attr_accessor :challenge
     attr_reader   :latest_request
     attr_reader   :controller
   
