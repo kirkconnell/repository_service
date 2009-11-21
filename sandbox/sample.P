@@ -1,0 +1,40 @@
+/* Local Policy */
+:-table says/2.
+:-multifile says/2.
+
+/* Sign rule */
+says(P, Statement) :-
+	says(PK, Statement),
+	pk_belong(PK, P).
+
+pk_belong(rsa_c5d1cc7eb8a393846116557e90950cab, simon).
+
+says(Group, Statement) :-
+	group_leader(Group, Leader),
+	says(Leader, Statement).
+
+group_leader(group0, simon).
+group_leader(group1, jeremiah).
+
+
+/* Local access policy */
+allow(PK, Access, Dir) :-
+	dir(Group, Dir),
+	says(Group, allow(PK, Access, Dir)).
+
+dir(group0, file1).
+dir(group0, file2).
+dir(group1, file3).
+
+
+/* Clauses for Context rsa_c5d1cc7eb8a393846116557e90950cab */
+says(rsa_c5d1cc7eb8a393846116557e90950cab,allow(PK,Access,Resources)):-says(rsa_c5d1cc7eb8a393846116557e90950cab,pk_bind(P,PK)),says(rsa_c5d1cc7eb8a393846116557e90950cab,allow(P,Access,Resources)).
+
+says(rsa_c5d1cc7eb8a393846116557e90950cab,pk_bind(jeremiah,rsa_3fcb4a57240d9287e43b8615e9994bba)).
+
+says(rsa_c5d1cc7eb8a393846116557e90950cab,allow(jeremiah,read,file1)).
+
+says(rsa_c5d1cc7eb8a393846116557e90950cab,allow(jeremiah,_anyAccess,file2)).
+
+says(rsa_c5d1cc7eb8a393846116557e90950cab,allow(jeremiah,read,file3)).
+

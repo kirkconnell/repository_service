@@ -19,10 +19,22 @@ module RepositoryService
       create_session_policy_file
     end
 
+    def session_filename
+      challenge = client.challenge      
+      "#{challenge}.P"
+    end
+
     def create_session_policy_file
-      File.open("./policies/#{client.challenge}.P", "w+") do |file|
+      File.open(session_filename, "w+") do |file|
+        add_local_policy_to file
         add_content_to file
       end
+    end
+
+    def add_local_policy_to(file)
+      file << "/* Local Policy */\n"
+      file << File.read("./policies/local.P")
+      file
     end
 
     def add_content_to(file)
@@ -37,12 +49,20 @@ module RepositoryService
       searched_cert = @certificate_clauses.select { |cert| cert[:pk] == pk }
       searched_cert.first[:translated]
     end
-    
-    def authorize_request_from(client)
-      @client = client
-      "granted"
+
+    def translate_request(request)
+      context = context_name(client.pk)
+      request.sub( /request\(/, "allow(#{context}, ") + "."
     end
-  
+    
+    def authorization
+      result = `echo halt. | xsb -e "[abcdefghijklmnop],#{translate_request client.latest_request}"`
+      if result === /.+yes.+/
+        "granted"
+      else
+        "denied"
+      end
+    end
     
   end
 end

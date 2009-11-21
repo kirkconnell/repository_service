@@ -24,3 +24,5 @@ allow(PK, Access, Dir) :-
 dir(group0, file1).
 dir(group0, file2).
 dir(group1, file3).
+
+
