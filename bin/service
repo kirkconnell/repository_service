@@ -25,9 +25,11 @@ while (sock = tcp.accept)
     
       sock.shutdown
       print "We're done here.\n"
+    rescue EOFError
+      print "\nClient Disconnected.\n"
     rescue
       print "Exception Occured: #{$!}\n#{$!.backtrace.join("\n")}"
-      print "Connection Closed.\n"
+      print "\nConnection Closed.\n"
     end
   end
 end
