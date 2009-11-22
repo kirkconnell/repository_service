@@ -1,3 +1,5 @@
 .autotest
 *~
 .eprj
+.xwam
+session_*.P

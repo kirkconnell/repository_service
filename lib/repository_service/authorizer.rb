@@ -21,7 +21,7 @@ module RepositoryService
 
     def authorization
       result = ask_xsb
-      puts result
+      #puts result
       if result === /.+yes.+/
         "granted"
       else
