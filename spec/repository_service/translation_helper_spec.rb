@@ -9,10 +9,12 @@ module RepositoryService
   describe TranslationHelper do
 
     before(:all) do
-      @pk = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQD6gkiTvzHRJQviUXnlK4aO2U7j
+      @pk = "-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQD6gkiTvzHRJQviUXnlK4aO2U7j
 M14MU3fyKvom7yTRrjq5cwVgtIEZb6ZFTX6wM4y4ii3r1qjoyuIKQwYV0heHswe6
 jmoAmGJyTNY1dtrshcXN6N3Co5zXCShmQdt/y3bUDl9/rrVHatAAwDhC9/RwecjG
-pV24BPuAEjIJfa1gVwIDAQAB" 
+pV24BPuAEjIJfa1gVwIDAQAB
+-----END PUBLIC KEY-----" 
       @controller = Controller.new
       @controller.be_quiet!
     end

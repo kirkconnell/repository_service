@@ -1,7 +1,7 @@
 .autotest
 *~
 .eprj
-.xwam
+*.xwam
 session_*.P
 abcdefghijklmnop.P
 
