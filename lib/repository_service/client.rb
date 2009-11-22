@@ -35,9 +35,10 @@ module RepositoryService
       raw_data = receive_message
       node = controller.parse_response(raw_data)
       signature = node.m
-      original = server.challenge
+      original = self.challenge
     
       controller.authenticate :signature => signature, :signed_data => original, :pk => self.public_key
+      server.client = self
       say "Signature Verification Succeded.\n"
     end
   
@@ -50,9 +51,16 @@ module RepositoryService
     def finished?
       !wait_for_next_message
     end
+
   private
     def keep_valid_certs(node)
-      node.certs.each { |cert| self.certs << cert if controller.authenticate(cert) }
+      node.certs.each do |cert| 
+        if controller.authenticate(cert)
+          self.certs << cert 
+        else
+          say "Invalid certicate received. Ignoring its content."
+        end
+      end
     end
   end
 end

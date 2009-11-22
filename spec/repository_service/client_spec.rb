@@ -12,7 +12,7 @@ module RepositoryService
     end
     
     def me
-      @me ||= mock("Server", {:challenge => "O HAI!"})
+      @me ||= mock("Server", {:challenge => "O HAI!", :client= => client})
     end
 
     before(:each) do
@@ -53,11 +53,24 @@ cyNTfLSHG14bgX2CQzz6z5saoYGZWI3blurN4M+yTLlYEQGcI5bqqoFy40V7b2UF
         client.credentials me
         client.certs.should be_empty
       end 
+
+      it "should say something if a certificate is invalid" do
+        client.controller.stub!(:authenticate => false)
+        client.should_receive(:say)
+        client.credentials me
+      end
     end
     
     it "should respond to my challenge" do
       client.stub!(:receive_message => RESP_MSG)
       client.controller.stub!(:authenticate => true)
+      client.responds me
+    end
+
+    it "should set client reference to authorizer when challenge response is successful" do
+      client.stub! :receive_message => RESP_MSG
+      client.controller.stub!(:authenticate => true)
+      me.should_receive(:client=)
       client.responds me
     end
     

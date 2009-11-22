@@ -19,9 +19,21 @@ module RepositoryService
       create_session_policy_file
     end
 
+    def authorization
+      result = ask_xsb
+      puts result
+      if result === /.+yes.+/
+        "granted"
+      else
+        "denied"
+      end
+    end
+
+    ###################################################
+
     def session_filename
       challenge = client.challenge      
-      "#{challenge}.P"
+      "session_#{challenge}.P"
     end
 
     def create_session_policy_file
@@ -51,17 +63,12 @@ module RepositoryService
     end
 
     def translate_request(request)
-      context = context_name(client.pk)
+      context = context_name(client.public_key)
       request.sub( /request\(/, "allow(#{context}, ") + "."
     end
-    
-    def authorization
-      result = `echo halt. | xsb -e "[abcdefghijklmnop],#{translate_request client.latest_request}"`
-      if result === /.+yes.+/
-        "granted"
-      else
-        "denied"
-      end
+
+    def ask_xsb
+      `echo halt. | xsb -e "[session_#{client.challenge}],#{translate_request client.latest_request}"`
     end
     
   end

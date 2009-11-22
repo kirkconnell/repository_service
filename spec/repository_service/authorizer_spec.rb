@@ -11,7 +11,7 @@ module RepositoryService
 
     before(:each) do
       @auth = Authorizer.new
-      @auth.client = mock("client", :latest_request => "request(read, file1)", :challenge => "abcdefghijklmnop", :pk => "?")
+      @auth.client = mock("client", :latest_request => "request(read, file1)", :challenge => "abcdefghijklmnop", :public_key => "?")
     end
 
     def cert_nodes
@@ -56,6 +56,7 @@ module RepositoryService
     end
 
     it "should authorize requests using datalog logic" do
+      @auth.stub!(:ask_xsb).and_return("no")
       @auth.load_certificates cert_nodes
       @auth.authorization.should == "denied"
     end

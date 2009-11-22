@@ -13,6 +13,11 @@ module RepositoryService
       @sock = sock
       @authorizer = RepositoryService::Authorizer.new
     end
+
+    def client=(value)
+      @authorizer.client = value
+      @authorizer.load_certificates value.certs
+    end
   
     def challenges(client)
       client.challenge = UUIDTools::UUID.random_create.to_s.delete '-'
@@ -22,8 +27,7 @@ module RepositoryService
     end
   
     def replies(client)
-      result = authorizer.authorize_request_from(client)
-      reply = "-----BEGIN REPOSITORY SERVER REPLY-----\n#{result}-----END REPOSITORY SERVER REPLY-----\n"
+      reply = "-----BEGIN REPOSITORY SERVER REPLY-----\n#{authorizer.authorization}\n-----END REPOSITORY SERVER REPLY-----\n"
       @sock.send(reply, 0)
     end
   
