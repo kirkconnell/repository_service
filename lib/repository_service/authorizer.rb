@@ -22,10 +22,8 @@ module RepositoryService
     def authorization
       result = ask_xsb
       if result == "| ?- | ?- \nyes\n| ?- \n| ?- "
-        puts "granted"
         "granted"
       else
-        puts "denied"
         "denied"
       end
     end
