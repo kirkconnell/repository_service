@@ -10,7 +10,7 @@ module RepositoryService
     end
 
     before(:each) do
-      @auth = Authorizer.new
+      @auth = Authorizer.new "./policies/local.P"
       @auth.client = mock("client", :latest_request => "request(read, file1)", :challenge => "abcdefghijklmnop", :public_key => "?")
     end
 

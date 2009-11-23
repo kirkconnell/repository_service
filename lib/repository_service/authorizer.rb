@@ -6,8 +6,9 @@ module RepositoryService
     attr_reader :certificate_clauses
     attr_accessor :client
     
-    def initialize
+    def initialize(policy_file)
       @certificate_clauses = []
+      @policy_file = policy_file
     end
     
     def load_certificates(cert_nodes)
@@ -31,7 +32,8 @@ module RepositoryService
     ###################################################
 
     def session_filename
-      challenge = client.challenge      
+      challenge = client.challenge
+      raise "Client hasn't been challenged." if challenge.blank?
       "session_#{challenge}.P"
     end
 
@@ -44,7 +46,7 @@ module RepositoryService
 
     def add_local_policy_to(file)
       file << "/* Local Policy */\n"
-      file << File.read("./policies/local.P")
+      file << File.read(@policy_file)
       file
     end
 

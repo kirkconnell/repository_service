@@ -8,11 +8,11 @@ module RepositoryService
     end
     
     def server
-      @server ||= Server.new(sock)
+      @server ||= Server.new(sock, "./policies/local.P")
     end
     
     def client
-      @client ||= mock("client", :latest_request => "request", :challenge= => "", :challenge => "", :certs => [])
+      @client ||= mock("client", :latest_request => "request", :challenge= => "abcdefghijklmnop", :challenge => "abcdefghijklmnop", :certs => [])
     end
 
     before(:all) do

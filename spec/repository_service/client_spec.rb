@@ -44,6 +44,7 @@ cyNTfLSHG14bgX2CQzz6z5saoYGZWI3blurN4M+yTLlYEQGcI5bqqoFy40V7b2UF
 
       it "should store authentic certificates" do
         client.controller.stub!(:authenticate => true)
+        client.stub!(:invalid?).and_return(false)
         client.credentials me
         client.certs.should_not be_empty
       end
@@ -83,6 +84,14 @@ cyNTfLSHG14bgX2CQzz6z5saoYGZWI3blurN4M+yTLlYEQGcI5bqqoFy40V7b2UF
       client.stub!(:receive_message => REQ_MSG)
       client.requests me
       client.latest_request.should == "request(read, files)"
+    end
+
+    it "should verify that a certificate is loaded in a valid date" do
+      controller = Controller.new
+      controller.be_quiet!
+      cred = controller.parse_credentials(CRED_MSG)
+      
+      client.invalid?(cred.certs.first).should == true
     end
     
   end

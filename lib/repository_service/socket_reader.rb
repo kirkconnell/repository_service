@@ -1,4 +1,5 @@
 require 'repository_service/sayer'
+require 'repository_service/client_exception'
 
 module RepositoryService
   module SocketReader
@@ -11,7 +12,7 @@ module RepositoryService
         say "Message Received:\n#{message}\n"
         message
       else
-        raise "Message exceeds 50K limit. Connection closed."
+        raise ClientException.new("Message exceeds 50K limit. Connection closed.")
       end
     end
 
@@ -27,7 +28,6 @@ module RepositoryService
     def wait_for_next_message
       results = select([@sock], nil, nil)
       if results[0].include? @sock
-        say "Incoming!\n"
         true
       else
         say "I don't know where that came from sir!\n"

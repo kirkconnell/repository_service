@@ -11,7 +11,7 @@ while (sock = tcp.accept)
   Thread.start do
     begin      
       RepositoryService.load_grammar
-      server = RepositoryService::Server.new(sock)
+      server = RepositoryService::Server.new(sock, RepositoryService.policy_file)
       client = RepositoryService::Client.new(sock)
       
       client.credentials  server
@@ -25,9 +25,15 @@ while (sock = tcp.accept)
     
       sock.shutdown
       print "We're done here.\n"
+    rescue RepositoryService::ClientException
+      sock.shutdown
+      print "\nClient Performed and Invalid Action. Connection Closed.\n"
+      print "#{$!}\n"
     rescue EOFError
+      sock.shutdown
       print "\nClient Disconnected.\n"
     rescue
+      sock.shutdown
       print "Exception Occured: #{$!}\n#{$!.backtrace.join("\n")}"
       print "\nConnection Closed.\n"
     end

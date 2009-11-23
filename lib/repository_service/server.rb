@@ -9,9 +9,9 @@ module RepositoryService
     include Sayer
     attr_reader :authorizer
   
-    def initialize(sock)
+    def initialize(sock, policy_file)
       @sock = sock
-      @authorizer = RepositoryService::Authorizer.new
+      @authorizer = RepositoryService::Authorizer.new(policy_file)
     end
 
     def client=(value)

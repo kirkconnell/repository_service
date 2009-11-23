@@ -49,6 +49,14 @@ module RepositoryService
         node = controller.parse_request(REQ_MSG)
         node.request.should_not be_blank
       end
+
+      it "should convert date validity strings to DateTime objects" do
+        validity_range = controller.parse_credentials(CRED_MSG).certs.first[:expiration_dates]
+        not_before, not_after = controller.convert_to_date(validity_range)
+
+        not_before.should == DateTime.new(2007,10,12,0,0,0)
+        not_after.should == DateTime.new(2007,12,19,0,0,0)
+      end
       
     end
     

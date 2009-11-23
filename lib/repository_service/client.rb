@@ -52,13 +52,32 @@ module RepositoryService
       !wait_for_next_message
     end
 
+    def invalid?(certificate)
+      if certificate[:expiration_dates].nil?
+        say "No validity limitation on certificate. Certificate is considered Permanent.\n"
+        false
+      else
+        not_before, not_after = controller.convert_to_date(certificate[:expiration_dates])
+        if DateTime.now < not_before
+          say "Certificate is not valid until #{not_before}\n"
+          true
+        elsif DateTime.now > not_after
+          say "Certificate is not valid after #{not_after}\n"
+          true
+        else
+          false
+        end
+      end
+    end
+
+
   private
     def keep_valid_certs(node)
-      node.certs.each do |cert| 
-        if controller.authenticate(cert)
+      node.certs.each do |cert|
+        if controller.authenticate(cert) && !invalid?(cert)
           self.certs << cert 
         else
-          say "Invalid certicate received. Ignoring its content."
+          say "Invalid certicate received. Ignoring its content.\n"
         end
       end
     end

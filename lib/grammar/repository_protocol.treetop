@@ -78,6 +78,10 @@ grammar RepositoryProtocol
         { :not_before => elements[2].data, :not_after => elements[4].data }
       end
 
+      def date_data
+        { :not_before => elements[2].date_data, :not_after => elements[4].date_data }
+      end
+
       def node_type
         "validity"
       end
@@ -87,8 +91,20 @@ grammar RepositoryProtocol
   rule time_tuple
     space "datime(" num "," num "," num "," num "," num "," num ")." space
     {
+
       def data
         text_value.delete "\r\n\s\t"
+      end
+
+      def date_data
+        {
+          :year => elements[2].text_value.to_i,
+          :month => elements[4].text_value.to_i,
+          :day => elements[6].text_value.to_i,
+          :hour => elements[8].text_value.to_i,
+          :minute => elements[10].text_value.to_i,
+          :second => elements[12].text_value.to_i,
+        }
       end
 
       def node_type
@@ -103,6 +119,7 @@ grammar RepositoryProtocol
       def data
         { :clauses => clauses.data, 
           :validity => optional_validity.data, 
+          :expiration_dates => optional_validity.date_data,
           :pk => public_key.data,
           :signature => signature.data,
           :signed_data => [ clauses.data, 
@@ -123,6 +140,10 @@ grammar RepositoryProtocol
     {
       def data
         elements.first.data unless elements.empty?
+      end
+
+      def date_data
+        elements.first.date_data unless elements.empty?
       end
 
       def node_type
