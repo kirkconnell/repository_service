@@ -17,11 +17,11 @@ module RepositoryService
         controller.parser.should_not be_nil
       end
       
-      describe "credentials" do
+      describe "credentials" do        
         before(:all) do
           @node = controller.parse_credentials(CRED_MSG)
         end
-      
+
         it "should parse credentials" do
           @node.public_key.should_not be_blank
         end
@@ -38,8 +38,8 @@ module RepositoryService
           cert[:signature].should_not be_blank
         end
         
-      end
-    
+      end  
+ 
       it "should parse challenge responses" do
         node = controller.parse_response(RESP_MSG)
         node.m.should_not be_blank
@@ -56,6 +56,11 @@ module RepositoryService
 
         not_before.should == DateTime.new(2007,10,12,0,0,0)
         not_after.should == DateTime.new(2007,12,19,0,0,0)
+      end
+
+      it "should parse credentials with no validity section" do
+        node = controller.parse_credentials(CRED_NO_VAL_MSG).certs
+        node.first[:validity].should be_nil
       end
       
     end

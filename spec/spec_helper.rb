@@ -12,5 +12,6 @@ IMP_CRED_MSG = File.read(File.join(File.dirname(__FILE__), "repository_service/m
 CRED_MSG = File.read(File.join(File.dirname(__FILE__), "repository_service/messages/cred.msg"))
 RESP_MSG = File.read(File.join(File.dirname(__FILE__), "repository_service/messages/resp.msg"))
 REQ_MSG = File.read(File.join(File.dirname(__FILE__), "repository_service/messages/req.msg"))
+CRED_NO_VAL_MSG = File.read(File.join(File.dirname(__FILE__), "repository_service/messages/cred_no_exp.msg"))
 
 RepositoryService.load_grammar

@@ -118,11 +118,12 @@ grammar RepositoryProtocol
     {
       def data
         { :clauses => clauses.data, 
-          :validity => optional_validity.data, 
-          :expiration_dates => optional_validity.date_data,
+          :validity => optional_validity.text_value == "" ? nil : optional_validity.data, 
+          :expiration_dates => optional_validity.text_value == "" ? nil : optional_validity.date_data,
           :pk => public_key.data,
           :signature => signature.data,
-          :signed_data => [ clauses.data, 
+          :signed_data => optional_validity.text_value == "" ? clauses.data : 
+                            [ clauses.data, 
                             optional_validity.data[:not_before],
                             optional_validity.data[:not_after] ].join,
           :clauses => clauses.elements 
@@ -139,7 +140,7 @@ grammar RepositoryProtocol
     validity?
     {
       def data
-        elements.first.data unless elements.empty?
+        elements.first.data 
       end
 
       def date_data
