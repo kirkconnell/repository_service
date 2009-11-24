@@ -6,7 +6,7 @@ says(P, Statement) :-
 	says(PK, Statement),
 	pk_belong(PK, P).
 
-pk_belong(rsa_b2fcee5a72a0f5674d6537e870d71543, simon).
+pk_belong(rsa_24b43de242841da601d90aef6e5e1af6, simon).
 
 says(Group, Statement) :-
 	group_leader(Group, Leader),
