@@ -47,7 +47,7 @@ module RepositoryService
 
     def authenticate_signature(signature, original, pk)
       key = OpenSSL::PKey::RSA.new(pk)
-      raise ClientException.new("Invalid Signature to Challenge Message.") unless 
+      raise ClientException.new("Invalid Signature.") unless 
         key.verify(OpenSSL::Digest::MD5.new, Base64.decode64(signature), original)
       true
     end

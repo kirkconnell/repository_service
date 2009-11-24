@@ -1,0 +1,1 @@
+allow(PK,Access,Resources):-pk_bind(P,PK),allow(P,Access,Resources).pk_bind(jeremiah,rsa_3fcb4a57240d9287e43b8615e9994bba).allow(jeremiah,read,file1).allow(jeremiah,_anyAccess,file2).allow(jeremiah,read,file3).datime(2009,10,12,0,0,0).datime(2009,12,19,0,0,0).

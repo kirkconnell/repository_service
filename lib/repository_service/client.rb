@@ -34,6 +34,7 @@ module RepositoryService
     def responds(server)
       raw_data = receive_message
       node = controller.parse_response(raw_data)
+      
       signature = node.m
       original = self.challenge
     
